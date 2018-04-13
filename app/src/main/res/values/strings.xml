@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Quizer</string>
+    <string name="downloading_info">Stan pobierania:</string>
 </resources>
