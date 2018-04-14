@@ -1,6 +1,7 @@
 package com.gaspard.quizer;
 
 
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -59,6 +60,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     // Replace the contents of a view (invoked by the layout manager)
 
 //    private
+    private static int width = -1;
+    public static int getScreenWidth() {
+        if (width < 0) width = Resources.getSystem().getDisplayMetrics().widthPixels;
+        return width;
+    }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -80,7 +86,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 .load(actEntity.getUrl())
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
                 .networkPolicy(NetworkPolicy.OFFLINE)
-                .resize(0, IMAGE_CACHING_HEIGHT)
+                .resize(getScreenWidth(), 0)
+                .onlyScaleDown()
                 .centerCrop()
                 .placeholder(R.drawable.progress_animation)
                 .error(R.drawable.ic_broken_image_black)

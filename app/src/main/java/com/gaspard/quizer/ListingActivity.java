@@ -8,6 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 
@@ -44,6 +47,36 @@ public class ListingActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.switch_pane);
+        item.setActionView(R.layout.switch_layout);
+        return true;
+//        @Override
+//        public boolean onCreateOptionsMenu(Menu menu) {
+//            getMenuInflater().inflate(R.menu.main, menu);
+//
+//            switchAB = (Switch)menu.findItem(R.id.switchId)
+//                    .getActionView().findViewById(R.id.switchAB);
+//
+//            switchAB.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+//                @Override
+//                public void onCheckedChanged(CompoundButton buttonView,
+//                                             boolean isChecked) {
+//                    if (isChecked) {
+//                        Toast.makeText(getApplication(), "ON", Toast.LENGTH_SHORT)
+//                                .show();
+//                    } else {
+//                        Toast.makeText(getApplication(), "OFF", Toast.LENGTH_SHORT)
+//                                .show();
+//                    }
+//                }
+//            });
+//            return true;
+//        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
