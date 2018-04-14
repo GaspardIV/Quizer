@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
 
 //public class AppDatabase {
 //}
-@Database(entities = {DataEntity.class}, version = 1, exportSchema = false)
+//@Database(entities = {DataEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {QuizzEntity.class}, version = 1, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;

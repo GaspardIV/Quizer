@@ -9,9 +9,9 @@ import java.util.List;
 @Dao
 public interface DataDao {
 
-    @Query("SELECT * FROM DataEntity")
-    List<DataEntity> getAll();
+    @Query("SELECT * FROM quizzes")
+    List<QuizzEntity> getAll();
 
     @Insert
-    void insertAll(DataEntity... dataEntities);
+    void insertAll(QuizzEntity... dataEntities);
 }
