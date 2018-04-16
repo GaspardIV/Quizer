@@ -21,7 +21,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="18sp"
+        android:textSize="24sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -68,6 +68,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onRadioButtonClicked"
+            android:textSize="18sp"
             android:visibility="invisible" />
 
         <RadioButton
@@ -80,6 +81,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onRadioButtonClicked"
+            android:textSize="18sp"
             android:visibility="invisible" />
 
         <RadioButton
@@ -92,6 +94,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onRadioButtonClicked"
+            android:textSize="18sp"
             android:visibility="invisible" />
 
         <RadioButton
@@ -105,6 +108,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:onClick="onRadioButtonClicked"
+            android:textSize="18sp"
             android:visibility="invisible" />
     </RadioGroup>
 

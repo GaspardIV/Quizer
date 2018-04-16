@@ -20,14 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionActivity extends AppCompatActivity {
-
-    private RadioButton r1, r2, r3, r4;
-    private TextView quizTitle, question;
-    private ProgressBar progressBar;
-    private ImageView quizImg;
     private QuizEntity quizzEntity;
     List<QuestionEntity> questionEntitiesl;
-    private int actualQuestionNumber = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,35 +54,101 @@ public class QuestionActivity extends AppCompatActivity {
             question.setVisibility(View.INVISIBLE);
             questionImage.setVisibility(View.GONE);
 
+            int actualQuestionIndex = quizzEntity.getLastQuestion() + 1;
+
+            // if it was first question, we reset the last result
+            if (actualQuestionIndex == 0) {
+                quizzEntity.setLastScore(0);
+            }
+
             switch (view.getId()) {
                 case R.id.ans1:
-                    if (r1.getText() == questionEntitiesl.get(actualQuestionNumber).getRightAnswer())
+                    if (r1.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
                         quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
                     break;
                 case R.id.ans2:
-                    if (r2.getText() == questionEntitiesl.get(actualQuestionNumber).getRightAnswer())
+                    if (r2.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
                         quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
                     break;
                 case R.id.ans3:
-                    if (r3.getText() == questionEntitiesl.get(actualQuestionNumber).getRightAnswer())
+                    if (r3.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
                         quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
                     break;
                 case R.id.ans4:
-                    if (r4.getText() == questionEntitiesl.get(actualQuestionNumber).getRightAnswer())
+                    if (r4.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
                         quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
                     break;
             }
-            if (actualQuestionNumber == quizzEntity.getQstCnt()) {
+            rg.clearCheck();
+            if (actualQuestionIndex == quizzEntity.getQstCnt() - 1) {
                 //TODO WRRZUC DDO BAZY DANYCH
                 quizzEntity.setLastQuestion(-1);
                 // go to result
             } else {
-                quizzEntity.setLastQuestion(actualQuestionNumber);
+                quizzEntity.setLastQuestion(actualQuestionIndex);
                 // tODO WRRZUC DDO BAZY DANYCH
-                actualQuestionNumber += 1;
-//                loadQuestion(actualQuestionNumber);
+                loadQuestion();
             }
         }
+    }
+
+    public void loadQuestion() {
+        RadioButton r1 = findViewById(R.id.ans1);
+        RadioButton r2 = findViewById(R.id.ans2);
+        RadioButton r3 = findViewById(R.id.ans3);
+        RadioButton r4 = findViewById(R.id.ans4);
+        RadioGroup rg = findViewById(R.id.radioG);
+        TextView question = findViewById(R.id.question);
+        ImageView questionImage = findViewById(R.id.question_img);
+        CardView cardView = findViewById(R.id.card_view);
+        QuizCardLoadHelper.setQuizStatus(quizzEntity, cardView);
+
+        int actualQuestionNumber = quizzEntity.getLastQuestion() + 1;
+        // question
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getQuestion())) {
+            question.setVisibility(View.VISIBLE);
+            question.setText(questionEntitiesl.get(actualQuestionNumber).getQuestion());
+        }
+
+        // image
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getImage())) {
+            questionImage.setVisibility(View.VISIBLE);
+            Picasso.get().load(questionEntitiesl.get(actualQuestionNumber).getImage())
+                    .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
+                    .into(questionImage);
+// TODO ONCLICK questionImage.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        Picasso.get().load(questionEntitiesl.get(actualQuestionNumber).getImage())
+//                                .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
+//                                .into(questionImage);
+//                    }
+//                });
+        }
+
+        //answers
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getAnswer1())) {
+            r1.setVisibility(View.VISIBLE);
+            r1.setText(questionEntitiesl.get(actualQuestionNumber).getAnswer1());
+        }
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getAnswer2())) {
+            r2.setVisibility(View.VISIBLE);
+            r2.setText(questionEntitiesl.get(actualQuestionNumber).getAnswer2());
+        }
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getAnswer3())) {
+            r3.setVisibility(View.VISIBLE);
+            r3.setText(questionEntitiesl.get(actualQuestionNumber).getAnswer3());
+        }
+        if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getAnswer4())) {
+            r4.setVisibility(View.VISIBLE);
+            r4.setText(questionEntitiesl.get(actualQuestionNumber).getAnswer4());
+        }
+        rg.setEnabled(true);
+    }
+
+
+    public static boolean isNotEmptyField(String str) {
+        return str != null && !str.equals("");
     }
 
     private static class GetterQuestionsFromDbTask extends AsyncTask<Void, Void, Void> {
@@ -132,24 +192,13 @@ public class QuestionActivity extends AppCompatActivity {
             QuestionActivity activity = activityReference.get();
             if (activity == null || activity.isFinishing()) return;
 
-            // find views
-            RadioButton r1 = activity.findViewById(R.id.ans1);
-            RadioButton r2 = activity.findViewById(R.id.ans2);
-            RadioButton r3 = activity.findViewById(R.id.ans3);
-            RadioButton r4 = activity.findViewById(R.id.ans4);
-            RadioGroup rg = activity.findViewById(R.id.radioG);
             CardView cardView = activity.findViewById(R.id.card_view);
             TextView quizTitle = cardView.findViewById(R.id.quiz_title);
-            TextView question = activity.findViewById(R.id.question);
-            ImageView questionImage = activity.findViewById(R.id.question_img);
 
-
-            //QUIZ
             quizTitle.setText(quizEntityRef.getTitle());
-            // can change
-            QuizCardLoadHelper.setQuizStatus(quizEntityRef, cardView);
 
-            //progres bar
+            // quiz image {
+
             final ImageView imgView = (ImageView) cardView.findViewById(R.id.quiz_img);
             if (UserPref.getLoadImagePref(activity)) {
                 QuizCardLoadHelper.loadQuizImageIntoView(quizEntityRef, imgView);
@@ -161,49 +210,9 @@ public class QuestionActivity extends AppCompatActivity {
                     }
                 });
             }
-            //
-
-            // question
-            if (isNotEmptyField(questionEntitiesRef.get(0).getQuestion())) {
-                question.setVisibility(View.VISIBLE);
-                question.setText(questionEntitiesRef.get(0).getQuestion());
-            }
-            if (isNotEmptyField(questionEntitiesRef.get(0).getImage())) {
-                questionImage.setVisibility(View.VISIBLE);
-                Picasso.get().load(questionEntitiesRef.get(0).getImage())
-                        .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
-                        .into(questionImage);
-// TODO ONCLICK questionImage.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Picasso.get().load(questionEntitiesRef.get(0).getImage())
-//                                .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
-//                                .into(questionImage);
-//                    }
-//                });
-            }
-            if (isNotEmptyField(questionEntitiesRef.get(0).getAnswer1())) {
-                r1.setVisibility(View.VISIBLE);
-                r1.setText(questionEntitiesRef.get(0).getAnswer1());
-            }
-            if (isNotEmptyField(questionEntitiesRef.get(0).getAnswer2())) {
-                r2.setVisibility(View.VISIBLE);
-                r2.setText(questionEntitiesRef.get(0).getAnswer2());
-            }
-            if (isNotEmptyField(questionEntitiesRef.get(0).getAnswer3())) {
-                r3.setVisibility(View.VISIBLE);
-                r3.setText(questionEntitiesRef.get(0).getAnswer3());
-            }
-            if (isNotEmptyField(questionEntitiesRef.get(0).getAnswer4())) {
-                r4.setVisibility(View.VISIBLE);
-                r4.setText(questionEntitiesRef.get(0).getAnswer4());
-            }
-            rg.setEnabled(true);
-            //
+            // }
+            activity.loadQuestion();
         }
 
-        public static boolean isNotEmptyField(String str) {
-            return str != null && !str.equals("");
-        }
     }
 }

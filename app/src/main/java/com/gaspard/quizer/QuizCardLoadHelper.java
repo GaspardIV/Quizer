@@ -3,6 +3,7 @@ package com.gaspard.quizer;
 import android.content.res.Resources;
 import android.support.v7.widget.CardView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Callback;
@@ -26,16 +27,23 @@ public class QuizCardLoadHelper {
 
 
     public static void setQuizStatus(QuizEntity actEntity, CardView cardView) {
+//        ((TextView) cardView.findViewById(R.id.quiz_score_progress_info)).setText(Integer.toString(actEntity.getLastScore()) + " " + Integer.toString(actEntity.getLastQuestion()));
+//        return;
+//        /*
         String desc = "";
+        ProgressBar progressBar = (ProgressBar) cardView.findViewById(R.id.progressBar);
+        progressBar.setMax(actEntity.getQstCnt());
+        progressBar.setProgress(actEntity.getLastQuestion() + 1);
         if (actEntity.getLastScore() >= 0 && actEntity.getLastQuestion() < 0) {
             desc = String.format(new Locale("pl"), SOLVED_STATUS,
                     actEntity.getLastScore(), actEntity.getQstCnt(),
-                    actEntity.getLastScore() / actEntity.getQstCnt() * 100);
+                    actEntity.getLastScore() * 100 / actEntity.getQstCnt());
         } else {
             desc = String.format(new Locale("pl"), SOLVING_STATUS,
-                    (actEntity.getLastQuestion() + 1) / actEntity.getQstCnt() * 100);
+                    (actEntity.getLastQuestion() + 1) * 100 / actEntity.getQstCnt());
         }
         ((TextView) cardView.findViewById(R.id.quiz_score_progress_info)).setText(desc);
+//        */
     }
 
     public static void loadQuizImageIntoView(final QuizEntity quizEntity, final ImageView imgView) {
