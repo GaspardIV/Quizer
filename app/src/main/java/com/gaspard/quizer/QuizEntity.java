@@ -21,6 +21,7 @@ public class QuizEntity {
         return url;
     }
 
+
     public void setUrl(String url) {
         this.url = url;
     }
@@ -78,8 +79,15 @@ public class QuizEntity {
     @ColumnInfo(name = "last_question")
     private int lastQuestion;
 
+    public QuizEntity(@NonNull int id) {
+        this.id = id;
+    }
 
     public QuizEntity(@NonNull int id, String url, String title, int qstCnt, int lastScore, int lastQuestion) {
+        setValues(id, url, title, qstCnt, lastScore, lastQuestion);
+    }
+
+    public void setValues(@NonNull int id, String url, String title, int qstCnt, int lastScore, int lastQuestion) {
         this.id = id;
         this.url = url;
         this.title = title;
