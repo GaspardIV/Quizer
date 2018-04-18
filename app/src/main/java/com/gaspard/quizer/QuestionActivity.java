@@ -36,7 +36,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        if (quizEntity != null) {
+        if (quizEntity != null && quizEntity.getLastQuestion() != -1) {
             QuizzesDatabase db = new QuizzesDatabase(this);
             db.setExistingQuiz(quizEntity);
             db.close();

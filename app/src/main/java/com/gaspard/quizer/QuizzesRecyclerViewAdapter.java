@@ -33,7 +33,7 @@ public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecy
         }
     }
 
-    public QuizzesRecyclerViewAdapter(ArrayList<QuizEntity> myDataset, Context context) {
+    QuizzesRecyclerViewAdapter(ArrayList<QuizEntity> myDataset, Context context) {
         quizEntities = myDataset;
         this.context = context;
     }

@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 
 @Entity(tableName = "questions")
 public class QuestionEntity {
-    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "id")
     private int id;
@@ -39,7 +38,7 @@ public class QuestionEntity {
     @ColumnInfo(name = "right")
     private String rightAnswer;
 
-    public QuestionEntity(@NonNull int id, int quizId, int questionNumber, String question, String image, String answer1, String answer2, String answer3, String answer4, String rightAnswer) {
+    QuestionEntity(int id, int quizId, int questionNumber, String question, String image, String answer1, String answer2, String answer3, String answer4, String rightAnswer) {
         this.id = id;
         this.quizId = quizId;
         this.questionNumber = questionNumber;
@@ -52,12 +51,11 @@ public class QuestionEntity {
         this.rightAnswer = rightAnswer;
     }
 
-    @NonNull
     public int getId() {
         return id;
     }
 
-    public void setId(@NonNull int id) {
+    public void setId(int id) {
         this.id = id;
     }
 
