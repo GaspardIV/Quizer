@@ -2,6 +2,7 @@ package com.gaspard.quizer;
 
 import android.content.res.Resources;
 import android.support.v7.widget.CardView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,14 +28,11 @@ public class QuizCardLoadHelper {
 
 
     public static void setQuizStatus(QuizEntity actEntity, CardView cardView) {
-//        ((TextView) cardView.findViewById(R.id.quiz_score_progress_info)).setText(Integer.toString(actEntity.getLastScore()) + " " + Integer.toString(actEntity.getLastQuestion()));
-//        return;
-//        /*
         String desc = "";
         ProgressBar progressBar = (ProgressBar) cardView.findViewById(R.id.progressBar);
         progressBar.setMax(actEntity.getQstCnt());
         progressBar.setProgress(actEntity.getLastQuestion() + 1);
-        if (actEntity.getLastScore() >= 0 && actEntity.getLastQuestion() < 0) {
+        if (actEntity.getLastScore() >= 0 && actEntity.getLastQuestion() + 1 == actEntity.getQstCnt()) {
             desc = String.format(new Locale("pl"), SOLVED_STATUS,
                     actEntity.getLastScore(), actEntity.getQstCnt(),
                     actEntity.getLastScore() * 100 / actEntity.getQstCnt());
@@ -43,7 +41,6 @@ public class QuizCardLoadHelper {
                     (actEntity.getLastQuestion() + 1) * 100 / actEntity.getQstCnt());
         }
         ((TextView) cardView.findViewById(R.id.quiz_score_progress_info)).setText(desc);
-//        */
     }
 
     public static void loadQuizImageIntoView(final QuizEntity quizEntity, final ImageView imgView) {

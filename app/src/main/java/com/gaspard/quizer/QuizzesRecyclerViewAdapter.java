@@ -1,8 +1,11 @@
 package com.gaspard.quizer;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +21,8 @@ import java.util.ArrayList;
 public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecyclerViewAdapter.ViewHolder> {
     private ArrayList<QuizEntity> quizEntities;
     private Context context;
+    private int lastQuizId = -1;
+    private int lastPosition;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout cardView;
@@ -43,12 +48,12 @@ public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecy
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final QuizEntity actEntity = quizEntities.get(position);
         ((TextView) holder.cardView.findViewById(R.id.quiz_title)).setText(actEntity.getTitle());
         QuizCardLoadHelper.setQuizStatus(actEntity, (CardView) holder.cardView.findViewById(R.id.card_view));
 
-        final ImageView imgView = (ImageView) holder.cardView.findViewById(R.id.quiz_img);
+        final ImageView imgView = holder.cardView.findViewById(R.id.quiz_img);
         if (UserPref.getLoadImagePref(context)) {
             imgView.setVisibility(View.VISIBLE);
             QuizCardLoadHelper.loadQuizImageIntoView(actEntity, imgView);
@@ -58,21 +63,47 @@ public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecy
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goToQuestion(actEntity.getId());
+                goToQuestions(actEntity.getId(), holder.getAdapterPosition());
             }
         });
 
     }
 
-    /*TODO PAMIETAC LASTQUESTION I updatowacc tylko ostatnie + double click disableowac*/
-    // TODO   mAdapter.notifyItemChanged(position);
-    private void goToQuestion(int id) {
+    private void goToQuestions(int quizId, int position) {
         Intent intent = new Intent(context, QuestionActivity.class);
-        intent.putExtra(EXTRA_MESSAGE, id);
+        intent.putExtra(QuestionActivity.EXTRA_MESSAGE_QID, quizId);
+        lastQuizId = quizId;
+        lastPosition = position;
         context.startActivity(intent);
     }
 
-    public static final String EXTRA_MESSAGE = "quizer.QUIZENTITY";
+    public void reloadLastSelectedQuiz() {
+        if (lastQuizId != -1) {
+            QuizzesDatabase db = new QuizzesDatabase(context);
+            new AsyncReloadLastAdapterPosition().execute(db);
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    class AsyncReloadLastAdapterPosition extends AsyncTask<QuizzesDatabase, Void, Cursor> {
+        QuizzesDatabase db;
+
+        @Override
+        protected Cursor doInBackground(QuizzesDatabase... quizzesDatabases) {
+            db = quizzesDatabases[0];
+            return db.getQuiz(lastQuizId);
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            super.onPostExecute(cursor);
+            quizEntities.set(lastPosition, new QuizEntity(cursor.getInt(0), cursor.getString(1),
+                    cursor.getString(2), cursor.getInt(3), cursor.getInt(4), cursor.getInt(5)));
+            cursor.close();
+            db.close();
+            notifyItemChanged(lastPosition);
+        }
+    }
 
     @Override
     public int getItemCount() {

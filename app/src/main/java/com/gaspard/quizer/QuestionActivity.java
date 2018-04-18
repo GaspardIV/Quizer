@@ -1,6 +1,6 @@
 package com.gaspard.quizer;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -20,18 +19,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestionActivity extends AppCompatActivity {
-    private QuizEntity quizzEntity;
+    private QuizEntity quizEntity;
     List<QuestionEntity> questionEntitiesl;
+    public static final String EXTRA_MESSAGE_QID = "quizer.QUESTION_ID_MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
-        final Integer quizId = getIntent().getIntExtra(QuizzesRecyclerViewAdapter.EXTRA_MESSAGE, 0);
+        Integer quizId = getIntent().getIntExtra(EXTRA_MESSAGE_QID, 0);
 
-        quizzEntity = new QuizEntity(-1);
+        quizEntity = new QuizEntity(-1);
         questionEntitiesl = new ArrayList<>();
-        new GetterQuestionsFromDbTask(this, quizId, quizzEntity, questionEntitiesl).execute();
+        new GetterQuestionsFromDbTask(this, quizId, quizEntity, questionEntitiesl).execute();
+    }
+
+    @Override
+    protected void onPause() {
+        if (quizEntity != null) {
+            QuizzesDatabase db = new QuizzesDatabase(this);
+            db.setExistingQuiz(quizEntity);
+            db.close();
+        }
+        super.onPause();
     }
 
     public void onRadioButtonClicked(View view) {
@@ -54,42 +64,49 @@ public class QuestionActivity extends AppCompatActivity {
             question.setVisibility(View.INVISIBLE);
             questionImage.setVisibility(View.GONE);
 
-            int actualQuestionIndex = quizzEntity.getLastQuestion() + 1;
+            int actualQuestionIndex = quizEntity.getLastQuestion() + 1;
 
             // if it was first question, we reset the last result
             if (actualQuestionIndex == 0) {
-                quizzEntity.setLastScore(0);
+                quizEntity.setLastScore(0);
             }
 
             switch (view.getId()) {
                 case R.id.ans1:
-                    if (r1.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
-                        quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
+                    if (r1.getText().equals(questionEntitiesl.get(actualQuestionIndex).getRightAnswer()))
+                        quizEntity.setLastScore(quizEntity.getLastScore() + 1);
                     break;
                 case R.id.ans2:
-                    if (r2.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
-                        quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
+                    if (r2.getText().equals(questionEntitiesl.get(actualQuestionIndex).getRightAnswer()))
+                        quizEntity.setLastScore(quizEntity.getLastScore() + 1);
                     break;
                 case R.id.ans3:
-                    if (r3.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
-                        quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
+                    if (r3.getText().equals(questionEntitiesl.get(actualQuestionIndex).getRightAnswer()))
+                        quizEntity.setLastScore(quizEntity.getLastScore() + 1);
                     break;
                 case R.id.ans4:
-                    if (r4.getText() == questionEntitiesl.get(actualQuestionIndex).getRightAnswer())
-                        quizzEntity.setLastScore(quizzEntity.getLastScore() + 1);
+                    if (r4.getText().equals(questionEntitiesl.get(actualQuestionIndex).getRightAnswer()))
+                        quizEntity.setLastScore(quizEntity.getLastScore() + 1);
                     break;
             }
+
             rg.clearCheck();
-            if (actualQuestionIndex == quizzEntity.getQstCnt() - 1) {
-                //TODO WRRZUC DDO BAZY DANYCH
-                quizzEntity.setLastQuestion(-1);
-                // go to result
+            quizEntity.setLastQuestion(actualQuestionIndex);
+            if (actualQuestionIndex == quizEntity.getQstCnt() - 1) {
+                startResultActivity(quizEntity);
             } else {
-                quizzEntity.setLastQuestion(actualQuestionIndex);
-                // tODO WRRZUC DDO BAZY DANYCH
                 loadQuestion();
             }
         }
+    }
+
+    private void startResultActivity(QuizEntity quizzEntity) {
+        Intent intent = new Intent(this, ResultActivity.class);
+        intent.putExtra(QuestionActivity.EXTRA_MESSAGE_QID, quizzEntity.getId());
+        intent.putExtra(ResultActivity.EXTRA_MESSAGE_SCORE, quizzEntity.getLastScore());
+        intent.putExtra(ResultActivity.EXTRA_MESSAGE_OUTOF, quizzEntity.getQstCnt());
+        finish();
+        startActivity(intent);
     }
 
     public void loadQuestion() {
@@ -101,9 +118,15 @@ public class QuestionActivity extends AppCompatActivity {
         TextView question = findViewById(R.id.question);
         ImageView questionImage = findViewById(R.id.question_img);
         CardView cardView = findViewById(R.id.card_view);
-        QuizCardLoadHelper.setQuizStatus(quizzEntity, cardView);
+        QuizCardLoadHelper.setQuizStatus(quizEntity, cardView);
 
-        int actualQuestionNumber = quizzEntity.getLastQuestion() + 1;
+        // if first question
+        int actualQuestionNumber = quizEntity.getLastQuestion() + 1;
+        if (actualQuestionNumber == quizEntity.getQstCnt()) {
+            quizEntity.setLastQuestion(-1);
+            actualQuestionNumber = 0;
+        }
+
         // question
         if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getQuestion())) {
             question.setVisibility(View.VISIBLE);
@@ -147,7 +170,7 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
 
-    public static boolean isNotEmptyField(String str) {
+    private static boolean isNotEmptyField(String str) {
         return str != null && !str.equals("");
     }
 
@@ -197,9 +220,8 @@ public class QuestionActivity extends AppCompatActivity {
 
             quizTitle.setText(quizEntityRef.getTitle());
 
-            // quiz image {
-
-            final ImageView imgView = (ImageView) cardView.findViewById(R.id.quiz_img);
+            // quiz image
+            final ImageView imgView = cardView.findViewById(R.id.quiz_img);
             if (UserPref.getLoadImagePref(activity)) {
                 QuizCardLoadHelper.loadQuizImageIntoView(quizEntityRef, imgView);
             } else {
@@ -210,7 +232,7 @@ public class QuestionActivity extends AppCompatActivity {
                     }
                 });
             }
-            // }
+
             activity.loadQuestion();
         }
 

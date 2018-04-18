@@ -2,4 +2,9 @@
     <string name="app_name">Quizer</string>
     <string name="downloading_info">Stan pobierania:</string>
     <string name="action_settings">ustawienia</string>
+    <string name="gzStr">Brawo!</string>
+    <string name="answered_on_str">Odpowiedziałeś poprawnie na:</string>
+    <string name="questions_str">pytań :)</string>
+    <string name="go_to_list_str">Przejdź\ndo listy\nquizów</string>
+    <string name="again_str">Rozwiąż\njeszcze\nraz</string>
 </resources>

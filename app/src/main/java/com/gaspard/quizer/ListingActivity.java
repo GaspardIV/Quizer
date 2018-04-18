@@ -1,6 +1,9 @@
 package com.gaspard.quizer;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Adapter;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -17,11 +21,7 @@ import java.util.ArrayList;
 
 public class ListingActivity extends AppCompatActivity {
 
-    private Cursor quizzesCursor;
-    private QuizzesDatabase db;
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private QuizzesRecyclerViewAdapter mAdapter;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,26 +53,42 @@ public class ListingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listing);
-        db = new QuizzesDatabase(this);
-        quizzesCursor = db.getQuizzes(); // TODO IN ASYNC
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true); // improved performance
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        ArrayList<QuizEntity> quiezzes = new ArrayList<>();
-        for (quizzesCursor.moveToFirst(); !quizzesCursor.isAfterLast(); quizzesCursor.moveToNext()) {
-            quiezzes.add(new QuizEntity(quizzesCursor.getInt(0), quizzesCursor.getString(1), quizzesCursor.getString(2), quizzesCursor.getInt(3), quizzesCursor.getInt(4), quizzesCursor.getInt(5)));
-        }
-        mAdapter = new QuizzesRecyclerViewAdapter(quiezzes, this);
-        mRecyclerView.setAdapter(mAdapter);
-
-
-        quizzesCursor.close();      //!!!!!!!!!!!!!!!!!!!!!!!
-        db.close();                 //!!!!!!!!!!!!!!!!!!!!!!!
-
+        new QuizzesRecyclerViewFromDBAsyncLoader(this).execute();
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class QuizzesRecyclerViewFromDBAsyncLoader extends AsyncTask<Void, Void, ArrayList<QuizEntity>> {
+        private Activity context;
+
+        QuizzesRecyclerViewFromDBAsyncLoader(Activity context) {
+            this.context = context;
+        }
+
+        @Override
+        protected ArrayList<QuizEntity> doInBackground(Void... voids) {
+            QuizzesDatabase db = new QuizzesDatabase(context);
+            Cursor quizzesCursor = db.getQuizzes();
+            ArrayList<QuizEntity> quiezzes = new ArrayList<>();
+            for (quizzesCursor.moveToFirst(); !quizzesCursor.isAfterLast(); quizzesCursor.moveToNext()) {
+                quiezzes.add(new QuizEntity(quizzesCursor.getInt(0), quizzesCursor.getString(1), quizzesCursor.getString(2), quizzesCursor.getInt(3), quizzesCursor.getInt(4), quizzesCursor.getInt(5)));
+            }
+            quizzesCursor.close();
+            db.close();
+            return quiezzes;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<QuizEntity> quizzes) {
+            super.onPostExecute(quizzes);
+            RecyclerView mRecyclerView = context.findViewById(R.id.recycler_view);
+            mRecyclerView.setHasFixedSize(true);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mAdapter = new QuizzesRecyclerViewAdapter(quizzes, context);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 
     @Override
@@ -81,4 +97,9 @@ public class ListingActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdapter != null) mAdapter.reloadLastSelectedQuiz();
+    }
 }
