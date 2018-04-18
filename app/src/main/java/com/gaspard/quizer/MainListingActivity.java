@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
@@ -13,15 +13,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Adapter;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class ListingActivity extends AppCompatActivity {
+public class MainListingActivity extends AppCompatActivity {
 
     private QuizzesRecyclerViewAdapter mAdapter;
+    private static final String IMG_UP = "Pobieranie okładek wł.";
+    private static final String IMG_DOWN = "Pobieranie okładek wył.";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -37,11 +38,11 @@ public class ListingActivity extends AppCompatActivity {
                                          boolean isChecked) {
                 if (isChecked) {
                     UserPref.setLoadImagePref(getApplication(), true);
-                    Toast.makeText(getApplication(), "Pobieranie okładek wł.", Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplication(), IMG_UP, Toast.LENGTH_SHORT)
                             .show();
                 } else {
                     UserPref.setLoadImagePref(getApplication(), false);
-                    Toast.makeText(getApplication(), "Pobieranie okładek wył.", Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplication(), IMG_DOWN, Toast.LENGTH_SHORT)
                             .show();
                 }
             }
@@ -54,7 +55,7 @@ public class ListingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listing);
         new QuizzesRecyclerViewFromDBAsyncLoader(this).execute();
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
     }
 
@@ -82,11 +83,11 @@ public class ListingActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(ArrayList<QuizEntity> quizzes) {
             super.onPostExecute(quizzes);
+            mAdapter = new QuizzesRecyclerViewAdapter(quizzes, context);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
             RecyclerView mRecyclerView = context.findViewById(R.id.recycler_view);
             mRecyclerView.setHasFixedSize(true);
-            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
             mRecyclerView.setLayoutManager(mLayoutManager);
-            mAdapter = new QuizzesRecyclerViewAdapter(quizzes, context);
             mRecyclerView.setAdapter(mAdapter);
         }
     }

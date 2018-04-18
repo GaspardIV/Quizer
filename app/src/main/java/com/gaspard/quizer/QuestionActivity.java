@@ -3,8 +3,8 @@ package com.gaspard.quizer;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.ImageView;
@@ -135,18 +135,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         // image
         if (isNotEmptyField(questionEntitiesl.get(actualQuestionNumber).getImage())) {
-            questionImage.setVisibility(View.VISIBLE);
-            Picasso.get().load(questionEntitiesl.get(actualQuestionNumber).getImage())
-                    .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
-                    .into(questionImage);
-// TODO ONCLICK questionImage.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Picasso.get().load(questionEntitiesl.get(actualQuestionNumber).getImage())
-//                                .placeholder(R.drawable.progress_animation).error(R.drawable.ic_broken_image_black)
-//                                .into(questionImage);
-//                    }
-//                });
+            loadQuestionImage(questionImage, actualQuestionNumber);
         }
 
         //answers
@@ -169,6 +158,19 @@ public class QuestionActivity extends AppCompatActivity {
         rg.setEnabled(true);
     }
 
+    private void loadQuestionImage(final ImageView questionImage, final int actualQuestionNumber) {
+        questionImage.setVisibility(View.VISIBLE);
+        Picasso.get().load(questionEntitiesl.get(actualQuestionNumber).getImage())
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.ic_broken_image_black)
+                .into(questionImage);
+        questionImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadQuestionImage(questionImage, actualQuestionNumber);
+            }
+        });
+    }
 
     private static boolean isNotEmptyField(String str) {
         return str != null && !str.equals("");

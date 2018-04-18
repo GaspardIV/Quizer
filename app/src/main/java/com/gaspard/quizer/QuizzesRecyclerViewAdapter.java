@@ -17,12 +17,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecyclerViewAdapter.ViewHolder> {
     private ArrayList<QuizEntity> quizEntities;
     private Context context;
     private int lastQuizId = -1;
     private int lastPosition;
+    private int[] someColors;
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout cardView;
@@ -36,6 +38,7 @@ public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecy
     QuizzesRecyclerViewAdapter(ArrayList<QuizEntity> myDataset, Context context) {
         quizEntities = myDataset;
         this.context = context;
+        someColors = context.getResources().getIntArray(R.array.androidcolors);
     }
 
     @NonNull
@@ -51,8 +54,9 @@ public class QuizzesRecyclerViewAdapter extends RecyclerView.Adapter<QuizzesRecy
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final QuizEntity actEntity = quizEntities.get(position);
         ((TextView) holder.cardView.findViewById(R.id.quiz_title)).setText(actEntity.getTitle());
-        QuizCardLoadHelper.setQuizStatus(actEntity, (CardView) holder.cardView.findViewById(R.id.card_view));
-
+        CardView card = holder.cardView.findViewById(R.id.card_view);
+        QuizCardLoadHelper.setQuizStatus(actEntity, card);
+        card.setBackgroundColor(someColors[new Random().nextInt(someColors.length)]);
         final ImageView imgView = holder.cardView.findViewById(R.id.quiz_img);
         if (UserPref.getLoadImagePref(context)) {
             imgView.setVisibility(View.VISIBLE);

@@ -6,36 +6,43 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ListingActivity"
-            android:theme="@style/AppTheme">
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
+            android:name=".MainListingActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".QuestionActivity"
-            android:parentActivityName=".ListingActivity">
+            android:parentActivityName=".MainListingActivity">
 
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.gaspard.quizer.ListingActivity" />
+                android:value="com.gaspard.quizer.MainListingActivity" />
         </activity>
         <activity
             android:name=".ResultActivity"
-            android:parentActivityName=".ListingActivity">
+            android:parentActivityName=".MainListingActivity">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.gaspard.quizer.ListingActivity" />
+                android:value="com.gaspard.quizer.MainListingActivity" />
         </activity>
     </application>
 

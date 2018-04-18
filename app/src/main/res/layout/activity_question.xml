@@ -21,7 +21,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:textSize="24sp"
+        android:textSize="20sp"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -30,6 +30,7 @@
 
     <!--albo center inside :) -->
     <ImageView
+        android:contentDescription="obrazek do pytania"
         android:id="@+id/question_img"
         android:layout_width="match_parent"
         android:layout_height="0dp"
