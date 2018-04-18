@@ -1,8 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_gravity="center"
@@ -31,7 +30,7 @@ xmlns:card_view="http://schemas.android.com/apk/res-auto">
             android:maxHeight="150dp"
             android:textAlignment="center"
             android:textColor="@android:color/white"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/quiz_score_progress_info"

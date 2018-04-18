@@ -7,4 +7,5 @@
     <string name="questions_str">pytań :)</string>
     <string name="go_to_list_str">Przejdź\ndo listy\nquizów</string>
     <string name="again_str">Rozwiąż\njeszcze\nraz</string>
+    <string name="image_desc">obrazek do pytania</string>
 </resources>
